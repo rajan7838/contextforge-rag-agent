@@ -1,0 +1,26 @@
+app:
+  title: "ContextForge - RAG AI Agent"
+  description: "Production-grade RAG with LangGraph + Groq LLM"
+
+agent:
+  model: "llama-3.1-8b-instant"
+  temperature: 0
+  pdf_path: "data/documents/attention.pdf"
+
+guardrails:
+  enabled: true
+  banned_keywords:
+    - "reveal your api key"
+    - "ignore previous instructions"
+    - "system prompt"
+    - "print secrets"
+    - "make a bomb"
+    - "hack"
+    - "jailbreak"
+    - "bypass"
+    - "inject"
+    - "malicious"
+
+database:
+  memory_db: "agent_memory.db"
+  chroma_db: "data/chroma_db"

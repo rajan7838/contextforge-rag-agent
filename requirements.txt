@@ -1,0 +1,29 @@
+# Core
+python-dotenv
+requests
+
+# LangChain & LangGraph
+langchain
+langchain-community
+langchain-groq
+langchain-ollama
+langgraph
+
+# Vector DB & RAG
+chromadb
+sentence-transformers
+
+# ML & NLP
+scikit-learn
+numpy
+pandas
+
+# Web Framework
+fastapi
+uvicorn
+streamlit
+
+# Utils
+pypdf
+
+langgraph-checkpoint-sqlite

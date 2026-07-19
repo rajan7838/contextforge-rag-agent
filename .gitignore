@@ -1,0 +1,6 @@
+.env 
+__pycache__/ 
+venv/ 
+*.db 
+data/chroma_db/ 
+training/training.py 
