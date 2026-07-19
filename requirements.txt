@@ -27,3 +27,5 @@ streamlit
 pypdf
 
 langgraph-checkpoint-sqlite
+
+langchain-huggingface==0.1.0

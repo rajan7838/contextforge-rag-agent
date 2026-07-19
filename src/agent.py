@@ -8,7 +8,7 @@ load_dotenv()
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_ollama import OllamaEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings  # CHANGED
 from langchain_groq import ChatGroq
 from langchain_community.vectorstores import Chroma
 from langchain_community.chat_message_histories import ChatMessageHistory
@@ -24,26 +24,32 @@ from src.guardrails import check_guardrails
 class UltimateRerankedAgent:
 
     def __init__(self, pdf_path='data/documents/attention.pdf', model="llama-3.1-8b-instant", temperature=0):
-        print("Initializing ContextForge Framework...")
+        print("🤖 Initializing ContextForge Framework...")
         
         self.llm = ChatGroq(model=model, temperature=temperature)
-        self.embeddings = OllamaEmbeddings(model='nomic-embed-text')
+        
+        # CHANGED: Using HuggingFace instead of Ollama
+        print("📥 Loading HuggingFace embeddings...")
+        self.embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+        
         self.store = {}
         
-        print("Loading Reranker...")
+        print("🔍 Loading Reranker...")
         self.reranker = CrossEncoder("BAAI/bge-reranker-base")
         
         persist_dir = "data/chroma_db"
         
         if os.path.exists(persist_dir):
-            print("Loading ChromaDB...")
+            print("💾 Loading ChromaDB...")
             vectorstore = Chroma(
                 persist_directory=persist_dir,
                 embedding_function=self.embeddings,
                 collection_name="hybrid_agent_knowledge"
             )
         elif os.path.exists(pdf_path):
-            print("Processing PDF...")
+            print("📄 Processing PDF...")
             loader = PyPDFLoader(pdf_path)
             docs = loader.load()
             splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
@@ -55,10 +61,10 @@ class UltimateRerankedAgent:
                 persist_directory=persist_dir,
                 collection_name="hybrid_agent_knowledge"
             )
-            print("ChromaDB created!")
+            print("✅ ChromaDB created!")
         else:
             vectorstore = None
-            print(" No PDF found.")
+            print("⚠️ No PDF found.")
 
         if vectorstore:
             self.retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
@@ -93,7 +99,7 @@ class UltimateRerankedAgent:
             send_email
         ]
         
-        print("Setting up Database State Storage...")
+        print("🗄️ Setting up Database State Storage...")
         self.conn = sqlite3.connect("agent_memory.db", check_same_thread=False)
         self.memory_saver = SqliteSaver(self.conn)
         
@@ -119,7 +125,7 @@ class UltimateRerankedAgent:
         )
         
         self.set_session("default_user")
-        print("System Ready!")
+        print("🚀 System Ready!")
 
     def set_session(self, session_id):
         self.session_id = session_id
@@ -135,7 +141,7 @@ class UltimateRerankedAgent:
 
     def stream_query(self, query):
         if not check_guardrails(query):
-            return "\nGuardrail Alert: Request violates safety policies."
+            return "\n🛡️ Guardrail Alert: Request violates safety policies."
 
         full_response = ""
         try:
